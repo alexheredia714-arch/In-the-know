@@ -1,5 +1,5 @@
 {
   "name": "KnowApp",
   "description": "A community-driven marketplace connecting people who need home projects done on a budget with skilled neighbors and handymen. Features AI-powered project estimation and job post drafting.",
-  "requestFramePermissions": []
+  "requestFramePermissions": ["camera"]
 }

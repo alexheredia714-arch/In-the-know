@@ -20,28 +20,42 @@ export const PostJobForm: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-        setIsSubmitting(false);
-        setIsSuccess(true);
-        // Reset form after 2 seconds
-        setTimeout(() => {
-            setIsSuccess(false);
-            setFormData({
-                title: '',
-                description: '',
-                category: JobCategory.OTHER,
-                budgetType: BudgetType.FIXED,
-                budgetAmount: '',
-                barterDescription: '',
-                location: '',
+    try {
+        const response = await fetch('/api/jobs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ...formData,
+                authorName: 'Sarah J.', // Mocking current user since auth isn't fully robust here yet
+                budgetAmount: formData.budgetAmount ? parseFloat(formData.budgetAmount) : undefined
             })
-        }, 2000);
-    }, 1500);
+        });
+
+        if (response.ok) {
+            setIsSubmitting(false);
+            setIsSuccess(true);
+            // Reset form after 2 seconds
+            setTimeout(() => {
+                setIsSuccess(false);
+                setFormData({
+                    title: '',
+                    description: '',
+                    category: JobCategory.OTHER,
+                    budgetType: BudgetType.FIXED,
+                    budgetAmount: '',
+                    barterDescription: '',
+                    location: '',
+                })
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('Failed to post job:', error);
+        setIsSubmitting(false);
+    }
   };
 
   if (isSuccess) {

@@ -27,6 +27,7 @@ export interface JobPost {
   location: string;
   postedAt: Date;
   authorName: string;
+  status: 'active' | 'completed' | 'cancelled';
 }
 
 export interface ChatMessage {
@@ -63,10 +64,28 @@ export interface Review {
   id: string;
   jobId: string;
   jobTitle: string;
+  dealType: BudgetType;
+  dealValue?: string; // e.g. "$50" or "Garden work"
   reviewerName: string;
   reviewerAvatar: string;
   rating: number; // 1-5
   comment: string;
   date: Date;
   metrics?: ReviewMetrics;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  location: string;
+  memberSince: string;
+  bio: string;
+  avatarUrl: string;
+  skills: string[];
+  stats: {
+    jobsPosted: number;
+    jobsCompleted: number;
+    rating: number;
+  };
+  reviews: Review[];
 }

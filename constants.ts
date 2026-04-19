@@ -5,6 +5,8 @@ export const MOCK_REVIEWS: Review[] = [
     id: 'r1',
     jobId: '101',
     jobTitle: 'Fix Leaky Kitchen Sink',
+    dealType: BudgetType.BARTER,
+    dealValue: 'Apple Pie',
     reviewerName: 'Sarah J.',
     reviewerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
     rating: 5,
@@ -20,6 +22,8 @@ export const MOCK_REVIEWS: Review[] = [
     id: 'r2',
     jobId: '102',
     jobTitle: 'Assemble Bookshelf',
+    dealType: BudgetType.HOURLY,
+    dealValue: '$20/hr',
     reviewerName: 'Emily R.',
     reviewerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emily',
     rating: 4,
@@ -35,6 +39,7 @@ export const MOCK_REVIEWS: Review[] = [
     id: 'r3',
     jobId: '103',
     jobTitle: 'Garage Cleanup',
+    dealType: BudgetType.VOLUNTEER,
     reviewerName: 'David K.',
     reviewerAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David',
     rating: 5,
@@ -73,7 +78,8 @@ export const MOCK_JOBS: JobPost[] = [
     barterDescription: 'Homemade Apple Pie & Coffee',
     location: 'Downtown Community',
     postedAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    authorName: 'Sarah J.'
+    authorName: 'Sarah J.',
+    status: 'active'
   },
   {
     id: '2',
@@ -84,7 +90,8 @@ export const MOCK_JOBS: JobPost[] = [
     budgetAmount: 50,
     location: 'Westside',
     postedAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    authorName: 'Mike T.'
+    authorName: 'Mike T.',
+    status: 'active'
   },
   {
     id: '3',
@@ -95,7 +102,8 @@ export const MOCK_JOBS: JobPost[] = [
     budgetAmount: 20,
     location: 'North Hills',
     postedAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
-    authorName: 'Emily R.'
+    authorName: 'Emily R.',
+    status: 'active'
   },
   {
     id: '4',
@@ -105,7 +113,8 @@ export const MOCK_JOBS: JobPost[] = [
     budgetType: BudgetType.VOLUNTEER,
     location: 'Central Park Area',
     postedAt: new Date(Date.now() - 1000 * 60 * 30),
-    authorName: 'Green Thumb Org'
+    authorName: 'Green Thumb Org',
+    status: 'active'
   }
 ];
 

@@ -1,13 +1,15 @@
 import React from 'react';
-import { Home, Hammer, PlusCircle, MessageCircle, Menu, X, User, MessageSquare } from 'lucide-react';
-import { MOCK_USER } from '../constants';
+import { Home, Hammer, PlusCircle, MessageCircle, Menu, X, User, MessageSquare, LogOut } from 'lucide-react';
+import { UserProfile } from '../types';
 
 interface NavigationProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  user: UserProfile | null;
+  onSignOut: () => void;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab }) => {
+export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab, user, onSignOut }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   const navItems = [
@@ -48,19 +50,38 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
             ))}
             
             {/* User Profile Button - Desktop */}
-            <div className="pl-4 border-l border-slate-200 ml-4 flex items-center">
-                 <button 
-                    onClick={() => setActiveTab('profile')}
-                    className={`flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-slate-50 transition-colors ${activeTab === 'profile' ? 'bg-slate-50 ring-2 ring-emerald-500 ring-offset-2' : ''}`}
-                 >
-                    <img 
-                        src={MOCK_USER.avatarUrl} 
-                        alt="User" 
-                        className="w-8 h-8 rounded-full bg-slate-200 border border-slate-300" 
-                    />
-                    <span className="text-sm font-medium text-slate-700 hidden lg:block">Profile</span>
-                 </button>
-            </div>
+            {user ? (
+              <div className="pl-4 border-l border-slate-200 ml-4 flex items-center">
+                   <button 
+                      onClick={() => setActiveTab('profile')}
+                      className={`flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-slate-50 transition-colors ${activeTab === 'profile' ? 'bg-slate-50 ring-2 ring-emerald-500 ring-offset-2' : ''}`}
+                   >
+                      <img 
+                          src={user.avatarUrl} 
+                          alt="User" 
+                          className="w-8 h-8 rounded-full bg-slate-200 border border-slate-300" 
+                      />
+                      <span className="text-sm font-medium text-slate-700 hidden lg:block">Profile</span>
+                   </button>
+                   <button 
+                      onClick={onSignOut}
+                      className="ml-2 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      title="Sign Out"
+                   >
+                      <LogOut className="w-5 h-5" />
+                   </button>
+              </div>
+            ) : (
+              <div className="pl-4 border-l border-slate-200 ml-4 flex items-center">
+                   <button 
+                      onClick={() => setActiveTab('profile')}
+                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700 transition-all shadow-sm flex items-center gap-2"
+                   >
+                      <User className="w-4 h-4" />
+                      Join Community
+                   </button>
+              </div>
+            )}
           </div>
 
           <div className="-mr-2 flex items-center sm:hidden">
@@ -100,22 +121,46 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab 
               </button>
             ))}
             
-             <button
-                onClick={() => {
-                  setActiveTab('profile');
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`${
-                  activeTab === 'profile'
-                    ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
-                    : 'border-transparent text-slate-500 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-700'
-                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium w-full text-left flex items-center border-t border-slate-100 mt-2 pt-4`}
-              >
-                 <div className="w-5 h-5 mr-3 flex items-center justify-center">
-                    <img src={MOCK_USER.avatarUrl} className="w-5 h-5 rounded-full" />
-                 </div>
-                My Profile
-              </button>
+            {user ? (
+              <>
+                <button
+                   onClick={() => {
+                     setActiveTab('profile');
+                     setIsMobileMenuOpen(false);
+                   }}
+                   className={`${
+                     activeTab === 'profile'
+                       ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
+                       : 'border-transparent text-slate-500 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-700'
+                   } block pl-3 pr-4 py-2 border-l-4 text-base font-medium w-full text-left flex items-center border-t border-slate-100 mt-2 pt-4`}
+                 >
+                    <div className="w-5 h-5 mr-3 flex items-center justify-center">
+                       <img src={user.avatarUrl} className="w-5 h-5 rounded-full" />
+                    </div>
+                   My Profile
+                 </button>
+                 <button
+                    onClick={() => {
+                      onSignOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block pl-3 pr-4 py-3 text-base font-medium w-full text-left flex items-center text-red-600 hover:bg-red-50 transition-colors border-t border-slate-100"
+                  >
+                    <LogOut className="w-5 h-5 mr-3" />
+                    Sign Out
+                  </button>
+              </>
+            ) : (
+              <button
+                 onClick={() => {
+                   setActiveTab('profile');
+                   setIsMobileMenuOpen(false);
+                 }}
+                 className="block w-full px-4 py-3 mt-4 text-center font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors"
+               >
+                 Join Community
+               </button>
+            )}
           </div>
         </div>
       )}

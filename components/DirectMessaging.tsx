@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, Search, ChevronLeft, CheckCheck } from 'lucide-react';
-import { Conversation, DirectMessage } from '../types';
+import { Conversation, DirectMessage, UserProfile } from '../types';
 import { MOCK_CONVERSATIONS } from '../constants';
 import { getDirectMessageResponse } from '../services/gemini';
 
@@ -9,9 +9,10 @@ interface DirectMessagingProps {
     recipientName: string;
     jobTitle: string;
   } | null;
+  user: UserProfile;
 }
 
-export const DirectMessaging: React.FC<DirectMessagingProps> = ({ initialChat }) => {
+export const DirectMessaging: React.FC<DirectMessagingProps> = ({ initialChat, user }) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [inputText, setInputText] = useState('');
@@ -94,7 +95,7 @@ export const DirectMessaging: React.FC<DirectMessagingProps> = ({ initialChat })
 
     const newMessage: DirectMessage = {
       id: `msg_${Date.now()}`,
-      senderId: 'me',
+      senderId: user.name,
       text: currentText,
       timestamp: new Date()
     };
@@ -130,7 +131,8 @@ export const DirectMessaging: React.FC<DirectMessagingProps> = ({ initialChat })
               const responseText = await getDirectMessageResponse(
                   activeConv.recipientName,
                   activeConv.relatedJobTitle || 'General Inquiry',
-                  [...activeConv.messages, newMessage]
+                  [...activeConv.messages, newMessage],
+                  user.name
               );
 
               // Simulate typing delay
@@ -263,7 +265,7 @@ export const DirectMessaging: React.FC<DirectMessagingProps> = ({ initialChat })
                 </div>
             )}
             {activeConversation?.messages.map((msg) => {
-              const isMe = msg.senderId === 'me';
+              const isMe = msg.senderId === user.name;
               return (
                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                   <div className={`flex flex-col max-w-[80%] ${isMe ? 'items-end' : 'items-start'}`}>

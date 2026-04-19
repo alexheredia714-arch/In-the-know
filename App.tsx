@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { Hero } from './components/Hero';
 import { JobBoard } from './components/JobBoard';
@@ -6,11 +6,31 @@ import { AIAdvisor } from './components/AIAdvisor';
 import { PostJobForm } from './components/PostJobForm';
 import { UserProfile } from './components/UserProfile';
 import { DirectMessaging } from './components/DirectMessaging';
-import { JobPost } from './types';
+import { ProfileSetup } from './components/ProfileSetup';
+import { JobPost, UserProfile as UserProfileType } from './types';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const [user, setUser] = useState<UserProfileType | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [pendingChat, setPendingChat] = useState<{ recipientName: string, jobTitle: string } | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/user');
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleContact = (job: JobPost) => {
     setPendingChat({
@@ -20,7 +40,37 @@ const App: React.FC = () => {
     setActiveTab('messages');
   };
 
+  const handleSignOut = async () => {
+    try {
+      const response = await fetch('/api/user/signout', { method: 'POST' });
+      if (response.ok) {
+        setUser(null);
+        setActiveTab('home');
+      }
+    } catch (error) {
+      console.error('Failed to sign out:', error);
+    }
+  };
+
   const renderContent = () => {
+    if (isLoadingUser) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      );
+    }
+
+    // Engagement protection
+    const needsProfile = ['post', 'messages', 'profile'].includes(activeTab);
+    if (needsProfile && !user) {
+      return (
+        <div className="py-12">
+           <ProfileSetup onComplete={(newProfile) => setUser(newProfile)} />
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case 'home':
         return (
@@ -43,11 +93,11 @@ const App: React.FC = () => {
             </div>
         );
       case 'messages':
-        return <DirectMessaging initialChat={pendingChat} />;
+        return <DirectMessaging initialChat={pendingChat} user={user} />;
       case 'advisor':
         return <AIAdvisor />;
       case 'profile':
-        return <UserProfile onContact={handleContact} />;
+        return <UserProfile onContact={handleContact} user={user} />;
       default:
         return <Hero onPostJob={() => setActiveTab('post')} onFindWork={() => setActiveTab('jobs')} />;
     }
@@ -55,7 +105,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Navigation activeTab={activeTab} setActiveTab={setActiveTab} user={user} onSignOut={handleSignOut} />
       <main>
         {renderContent()}
       </main>

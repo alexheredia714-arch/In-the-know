@@ -37,7 +37,8 @@ export const getProjectAdvice = async (userQuery: string): Promise<string> => {
 export const getDirectMessageResponse = async (
   recipientName: string,
   jobTitle: string,
-  history: { senderId: string; text: string }[]
+  history: { senderId: string; text: string }[],
+  userName: string = 'User'
 ): Promise<string> => {
   if (!process.env.API_KEY) {
     return "I'm interested! Tell me more.";
@@ -45,7 +46,7 @@ export const getDirectMessageResponse = async (
 
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const conversationHistory = history.map(h => `${h.senderId === 'me' ? 'User' : recipientName}: ${h.text}`).join('\n');
+    const conversationHistory = history.map(h => `${h.senderId === userName ? userName : recipientName}: ${h.text}`).join('\n');
     
     const prompt = `
       You are simulating a response from "${recipientName}" in a community project app called KnowApp.

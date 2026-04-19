@@ -1,23 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { JobPost, JobCategory } from '../types';
 import { JobCard } from './JobCard';
-import { MOCK_JOBS } from '../constants';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Loader2 } from 'lucide-react';
 
 interface JobBoardProps {
   onContact?: (job: JobPost) => void;
 }
 
 export const JobBoard: React.FC<JobBoardProps> = ({ onContact }) => {
+  const [jobs, setJobs] = useState<JobPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState<string>('All');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredJobs = MOCK_JOBS.filter(job => {
-    const matchesCategory = filterCategory === 'All' || job.category === filterCategory;
-    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          job.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch('/api/jobs');
+        if (response.ok) {
+          const data = await response.json();
+          setJobs(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch jobs:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchJobs();
+  }, []);
+
+  const filteredJobs = jobs
+    .filter(job => job.status === 'active')
+    .filter(job => {
+      const matchesCategory = filterCategory === 'All' || job.category === filterCategory;
+      const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            job.description.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+
+  if (isLoading) {
+    return (
+        <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+            <Loader2 className="w-10 h-10 animate-spin mb-4 text-emerald-500" />
+            <p>Finding local opportunities...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
